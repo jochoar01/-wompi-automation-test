@@ -1,0 +1,25 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Compiled files
+*.class
+*.jar
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+*.properties.local
+
+# OS
+.DS_Store
+Thumbs.db
