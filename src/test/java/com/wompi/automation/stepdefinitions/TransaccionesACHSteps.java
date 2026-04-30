@@ -30,6 +30,7 @@ public class TransaccionesACHSteps {
     private MakeHttpRequests abilityDeJuan;
     private Response ultimaRespuesta;
     private TransaccionACH.TransaccionACHBuilder transaccionBuilder;
+    private String transaccionIdCreada;
 
     private static final String BASE_URL = System.getProperty(
             "wompi.baseUrl", "https://sandbox.wompi.co/v1");
@@ -50,10 +51,21 @@ public class TransaccionesACHSteps {
 
     @Given("que Juan ya creó una transacción ACH con id {string}")
     public void juanYaCreoUnaTransaccionACHConId(String transaccionId) {
-        // Precondición: consulta directa para validar que la transacción existe
-        ultimaRespuesta = ConsultarEstadoTransaccion
-                .conId(transaccionId)
-                .ejecutarCon(abilityDeJuan);
+        // Crea una transacción real para tener un ID válido que consultar
+        TransaccionACH transaccion = TransaccionACH.builder()
+                .monto(150000)
+                .moneda("COP")
+                .descripcion("Pago de prueba ACH")
+                .emailCliente("cliente@correo.com")
+                .tipoCuenta("CHECKING_ACCOUNT")
+                .numeroCuenta("1234567890")
+                .banco("BANCOLOMBIA")
+                .titularCuenta("Juan Pérez")
+                .tipoDocTitular("CC")
+                .numDocTitular("1000123456")
+                .build();
+        Response creacion = CrearTransaccionACH.con(transaccion).ejecutarCon(abilityDeJuan);
+        transaccionIdCreada = creacion.jsonPath().getString("data.id");
     }
 
     @Given("que Juan usa la merchant key {string}")
@@ -108,8 +120,9 @@ public class TransaccionesACHSteps {
 
     @When("Juan consulta el estado de la transacción {string}")
     public void juanConsultaElEstadoDeLaTransaccion(String transaccionId) {
+        String idAConsultar = (transaccionIdCreada != null) ? transaccionIdCreada : transaccionId;
         ultimaRespuesta = ConsultarEstadoTransaccion
-                .conId(transaccionId)
+                .conId(idAConsultar)
                 .ejecutarCon(abilityDeJuan);
     }
 

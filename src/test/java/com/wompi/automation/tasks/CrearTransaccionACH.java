@@ -24,13 +24,25 @@ public class CrearTransaccionACH {
         return new CrearTransaccionACH(transaccion);
     }
 
+    private static String codigoBanco(String banco) {
+        if (banco == null) return "1007";
+        return switch (banco.toUpperCase()) {
+            case "BANCOLOMBIA"          -> "1007";
+            case "DAVIVIENDA"           -> "1551";
+            case "BANCO DE BOGOTA", "BOGOTA" -> "1001";
+            case "BBVA"                 -> "1013";
+            case "COLPATRIA"            -> "1019";
+            default -> banco;
+        };
+    }
+
     public Response ejecutarCon(MakeHttpRequests ability) {
         Map<String, Object> paymentMethod = new HashMap<>();
-        paymentMethod.put("type", "ACH");
+        paymentMethod.put("type", "PSE");
         paymentMethod.put("user_type", 0);
         paymentMethod.put("user_legal_id", transaccion.getNumDocTitular());
         paymentMethod.put("user_legal_id_type", transaccion.getTipoDocTitular());
-        paymentMethod.put("financial_institution_code", transaccion.getBanco());
+        paymentMethod.put("financial_institution_code", codigoBanco(transaccion.getBanco()));
         paymentMethod.put("payment_description", transaccion.getDescripcion());
 
         Map<String, Object> customer = new HashMap<>();

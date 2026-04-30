@@ -32,9 +32,12 @@ public class ObtenerStatusTransaccion {
     }
 
     public static String mensajeErrorDesde(Response respuesta) {
-        String mensaje = respuesta.jsonPath().getString("error.reason");
-        if (mensaje == null) mensaje = respuesta.jsonPath().getString("error.messages[0]");
-        if (mensaje == null) mensaje = respuesta.jsonPath().getString("message");
-        return mensaje;
+        // Auth/Not-found errors: {"error":{"reason":"..."}}
+        String razon = respuesta.jsonPath().getString("error.reason");
+        if (razon != null) return razon;
+        // Validation errors: {"error":{"messages":{"field":["msg",...]}}}
+        Object mensajes = respuesta.jsonPath().get("error.messages");
+        if (mensajes != null) return mensajes.toString();
+        return respuesta.jsonPath().getString("message");
     }
 }

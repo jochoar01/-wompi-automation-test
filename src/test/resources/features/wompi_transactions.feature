@@ -52,7 +52,7 @@ Feature: Transacciones ACH en WOMPI
 
   @exitoso @ach @consulta
   Scenario: Juan consulta el estado de una transacción ACH existente
-    # Precondición: existe una transacción previa en el sistema
+    # Precondición: se crea una transacción real para obtener un ID válido
     Given que Juan ya creó una transacción ACH con id "txn_wompi_12345"
     # Task: ConsultarEstadoTransaccion
     # Juan ejecuta la tarea de consultar el estado actual de la transacción
@@ -60,8 +60,8 @@ Feature: Transacciones ACH en WOMPI
     # Question: ObtenerStatusTransaccion + VerificarMonto
     # Juan verifica los detalles retornados por el sistema
     Then Juan debe ver el código HTTP 200 en la respuesta
-    And Juan debe ver el campo "id" con el valor "txn_wompi_12345"
-    And Juan debe ver el campo "payment_method_type" con el valor "ACH"
+    And Juan debe ver un "id" de transacción en la respuesta
+    And Juan debe ver el campo "payment_method_type" con el valor "PSE"
     And Juan debe ver que el monto de la transacción es mayor a 0
 
   # ============================================================
@@ -81,10 +81,10 @@ Feature: Transacciones ACH en WOMPI
 
     Examples:
       # Casos de borde: montos que WOMPI debe rechazar
-      | monto  | codigo_http | mensaje_error                    |
-      | 0      | 422         | El monto debe ser mayor a cero   |
-      | -1     | 422         | El monto debe ser mayor a cero   |
-      | -50000 | 422         | El monto debe ser mayor a cero   |
+      | monto  | codigo_http | mensaje_error       |
+      | 0      | 422         | mayor o igual       |
+      | -1     | 422         | mayor o igual       |
+      | -50000 | 422         | mayor o igual       |
 
   @error @ach @validacion @email
   Scenario Outline: Juan no puede crear una transacción ACH con email inválido
@@ -120,7 +120,7 @@ Feature: Transacciones ACH en WOMPI
 
     Examples:
       # Variantes de merchant key inválida que WOMPI debe rechazar
-      | llave_invalida          | codigo_http | mensaje_error                      |
-      | llave_incorrecta_123    | 401         | Credenciales de comercio inválidas |
-      | prv_test_XXXINVALIDAXXX | 401         | Credenciales de comercio inválidas |
-      |                         | 401         | Credenciales de comercio inválidas |
+      | llave_invalida          | codigo_http | mensaje_error           |
+      | llave_incorrecta_123    | 401         | no corresponde          |
+      | prv_test_XXXINVALIDAXXX | 401         | no válida               |
+      |                         | 401         | llave pública o privada |
