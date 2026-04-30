@@ -15,6 +15,27 @@ Implementado con **Screenplay Pattern** + **BDD Cucumber** + **REST Assured**.
 
 ---
 
+## Configuración rápida
+
+1. Clona el repositorio:
+```bash
+git clone https://github.com/jochoar01/wompi-automation-test.git
+cd wompi-automation-test
+```
+
+2. Edita `src/test/resources/config/wompi.properties`:
+```properties
+wompi.baseUrl=https://api.co.uat.wompi.dev/v1
+wompi.merchantKey=prv_stagtest_TU_LLAVE_AQUI
+```
+
+3. Compila:
+```bash
+mvn clean compile
+```
+
+---
+
 ## Ejecución
 
 ```bash
@@ -35,7 +56,8 @@ mvn clean test -Dwompi.merchantKey=prv_test_TU_LLAVE -Dcucumber.filter.tags="@er
 ```
 -wompi-automation-test/
 ├── docs/
-│   └── ARCHITECTURE.md                    # Documentación del Screenplay Pattern
+│   ├── ARCHITECTURE.md                    # Documentación del Screenplay Pattern
+│   └── wompi-automation-presentation.pptx # Presentación 5 min
 ├── src/
 │   └── test/
 │       ├── java/
@@ -70,6 +92,28 @@ mvn clean test -Dwompi.merchantKey=prv_test_TU_LLAVE -Dcucumber.filter.tags="@er
 
 ---
 
+## Estado actual
+
+### ✅ Completado
+- 5 escenarios automatizados (2 happy path + 3 error handling)
+- Arquitectura Screenplay completa
+- Feature files con Gherkin profesional
+- Integración REST Assured
+- Presentación 5 minutos
+
+### ⚠️ Limitaciones
+- Algunos tests fallan por **token sandbox expirado**
+- Se requiere **merchant key válida** de WOMPI
+- URL y ambiente pueden variar según configuración
+
+### 🔄 Próximos pasos
+- Validar credenciales en ambiente real
+- Agregar CI/CD (GitHub Actions/Jenkins)
+- Generar reportes Cucumber HTML
+- Data-driven testing con más casos
+
+---
+
 ## Patrón Screenplay
 
 | Componente | Clase | Responsabilidad |
@@ -99,9 +143,28 @@ Ver [ARCHITECTURE.md](docs/ARCHITECTURE.md) para el flujo completo.
 
 ---
 
+## Cómo agregar nuevos escenarios
+
+1. Edita `src/test/resources/features/wompi_transactions.feature`
+2. Agrega un nuevo `Scenario:`
+3. Usa steps existentes o crea nuevos en `TransaccionesACHSteps.java`
+4. Ejecuta `mvn clean test`
+
+Ejemplo:
+```gherkin
+@nuevo @ach @creacion
+Scenario: Juan crea múltiples transacciones en secuencia
+  When Juan intenta crear 3 transacciones ACH con montos diferentes
+  Then Todas deben retornar status "PENDING_PAYMENT"
+  And Todas deben tener IDs únicos
+```
+
+---
+
 ## Documentación
 
 - [WOMPI API](https://docs.wompi.co/)
 - [Cucumber](https://cucumber.io/docs/cucumber/)
 - [REST Assured](https://rest-assured.io/)
 - [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+- [Screenplay Pattern](docs/ARCHITECTURE.md)
